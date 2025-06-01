@@ -1,0 +1,46 @@
+plugins {
+    id 'org.springframework.boot' version '3.3.0' // 또는 현재 시점의 최신 안정화 버전
+    id 'io.spring.dependency-management' version '1.1.5' // 또는 현재 시점의 최신 안정화 버전
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot WebFlux 스타터
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // 데이터베이스 연동 (R2DBC MariaDB)
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    runtimeOnly 'org.mariadb:r2dbc-mariadb' // MariaDB 공식 R2DBC 드라이버
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB JDBC 드라이버 (R2DBC에서 내부적으로 사용될 수 있음)
+
+    // Lombok (선택 사항: 코드 간소화)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 유효성 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 비밀번호 인코딩
+    implementation 'org.springframework.security:spring-security-core'
+
+    // 테스트 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
