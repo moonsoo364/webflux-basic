@@ -7,6 +7,9 @@ import org.example.auth.dto.AuthResponse;
 import org.example.auth.dto.MemberDto;
 import org.example.auth.service.AuthService;
 import org.example.auth.service.MemberService;
+
+import org.example.common.consts.ResultCode;
+import org.example.common.dto.ApiResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,9 +34,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public Mono<ResponseEntity<String>> register(@Valid @RequestBody MemberDto dto){
+    public Mono<ResponseEntity<ApiResponseDto>> register(@Valid @RequestBody MemberDto dto){
         return memberService.registerMember(dto)
-                .map(member -> ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!"))
-                .onErrorResume(IllegalArgumentException.class, e-> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("check your member request")));
+                .map(member -> ResponseEntity.status(HttpStatus.CREATED)
+                        .body(
+                                new ApiResponseDto(
+                                        ResultCode.SUCCESS,"User registered successfully!")
+                        ))
+                .onErrorResume(IllegalArgumentException.class, e-> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(
+                                new ApiResponseDto(ResultCode.BAD_REQUEST,"check your member request")
+                        ))
+                );
     }
 }
