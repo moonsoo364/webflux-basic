@@ -23,7 +23,11 @@ public class AuthServiceImpl implements AuthService{
                 .filter(member -> passwordEncoder.matches(
                         authRequest.getPassword(),
                         member.getPassword()))
-                .map(member -> new AuthResponse(jwtUtil.generateToken(member.getUserId(), member.getUserRole()),member.getUserId()))
+                .map(member -> new AuthResponse
+                        (
+                            jwtUtil.generateToken(member.getUserId(),
+                            member.getUserRole()),member.getUserId()
+                        ))
                 .switchIfEmpty(Mono.error(new BadCredentialsException("InValid credentials")));
     }
 }
