@@ -2,6 +2,7 @@ package org.example.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.auth.jwt.JwtUtil;
+import org.example.auth.repository.MemberRepository;
 import org.example.auth.service.MemberService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableReactiveMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final MemberService memberService;
+    private final MemberRepository repository;
     private final JwtUtil jwtUtil;
 
     @Bean
@@ -36,7 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveUserDetailsService reactiveUserDetailsService() {
-        return username -> memberService.findByUserId(username)
+        return userId -> repository.findByUserId(userId)
                 .cast(UserDetails.class);
     }
 
