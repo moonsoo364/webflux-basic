@@ -1,8 +1,10 @@
 package org.example.auth.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.example.auth.dto.MemberDto;
+import org.example.common.model.LocaleDateEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
@@ -17,9 +19,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Table("member") // R2DBC에서 사용하는 Table 매핑
-public class Member implements UserDetails, Persistable<String> {
+public class Member extends LocaleDateEntity implements UserDetails, Persistable<String> {
 
     @Id
     @Column("user_id")
