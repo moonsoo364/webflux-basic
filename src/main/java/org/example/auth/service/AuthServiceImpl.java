@@ -19,9 +19,9 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public Mono<AuthResponse> authenticate(AuthRequest authRequest) {
-        return memberService.findByUserId(authRequest.getUserId())
+        return memberService.findByUserId(authRequest.userId())
                 .filter(member -> passwordEncoder.matches(
-                        authRequest.getPassword(),
+                        authRequest.password(),
                         member.getPassword()))
                 .map(member -> new AuthResponse
                         (
