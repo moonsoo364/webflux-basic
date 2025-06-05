@@ -1,4 +1,8 @@
 spring:
+  webflux:
+    #base-path: /api # API 기본 URL
+    #static-path-pattern: /static/**
+    max-in-memory-size: 10MB #BodyExtractors를 사용할 때, 메모리로 읽을 수 있는 최대 바이트 수
   profiles:
     active: local
   r2dbc:
@@ -11,4 +15,4 @@ server:
   port: 8080
 logging:
   level:
-    org.springframework.r2dbc.core: DEBUG
+     org.springframework.r2dbc.core: DEBUG # R2DBC SQL 로그 디버깅
