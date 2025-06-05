@@ -3,3 +3,7 @@ spring:
     url: r2dbc:mariadb://mariadb:3306/delivery_map # 데이터베이스 이름에 맞게 변경
     username: MAP_APP
     password: ${MAP_APP_PW}
+jwt:
+  secret: ${ENC_KEY}
+  expiration: 900000 #jwt 만료시간
+

@@ -1,4 +1,4 @@
-package org.example.config;
+package org.example.config.auth;
 
 import org.example.auth.jwt.JwtUtil;
 import org.springframework.http.HttpHeaders;

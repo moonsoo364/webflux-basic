@@ -1,6 +1,5 @@
-package org.example.config;
+package org.example.config.auth;
 
-import lombok.RequiredArgsConstructor;
 import org.example.auth.jwt.JwtUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

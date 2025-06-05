@@ -37,11 +37,11 @@ public class Member extends LocaleDateEntity implements UserDetails, Persistable
     @Column("user_role")
     private String userRole;
 
-    @Column("reg_dt")
-    private LocalDateTime regDt;
-
-    @Column("upd_dt")
-    private LocalDateTime updDt;
+//    @Column("reg_dt")
+//    private LocalDateTime regDt;
+//
+//    @Column("upd_dt")
+//    private LocalDateTime updDt;
 
     /** Persistable<String> 관련 코드 시작 */
     @Transient
@@ -80,6 +80,11 @@ public class Member extends LocaleDateEntity implements UserDetails, Persistable
     @Override
     public String getUsername() {
         return this.userId;
+    }
+
+    // UserDetails Override getUsername 메서드 때문에 따로 Getter 생성
+    public String getUserRealName(){
+        return this.userName;
     }
 
     @Override

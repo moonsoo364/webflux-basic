@@ -1,9 +1,11 @@
 package org.example.auth.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class JwtUtil {
 
     @Value("${jwt.secret}")
@@ -64,10 +67,10 @@ public class JwtUtil {
         final Instant expirationDate = createdDate.plusMillis(expirationTimeMillis);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(Date.from(createdDate))
-                .setExpiration(Date.from(expirationDate))
+                .claims(claims)
+                .subject(username)
+                .issuedAt(Date.from(createdDate))
+                .expiration(Date.from(expirationDate))
                 .signWith(key)
                 .compact();
     }
@@ -75,11 +78,9 @@ public class JwtUtil {
     public Boolean validateToken(String token) {
         try {
             // 토큰을 파싱할 수 있는지 확인하여 유효성 검사
-            getAllClaimsFromToken(token); // 이 호출에서 verifyWith(key)를 통해 서명 검증이 이루어집니다.
             return !isTokenExpired(token); // 토큰이 만료되지 않았는지 추가 확인
-        } catch (Exception e) {
-            // JWT 관련 예외 발생 시 (예: SignatureException, ExpiredJwtException 등)
-            // 토큰이 유효하지 않다고 판단
+        } catch (ExpiredJwtException e) {
+            log.error("## Token Expired : {}", e.getMessage());
             return false;
         }
     }

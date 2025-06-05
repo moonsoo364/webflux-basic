@@ -1,8 +1,14 @@
 spring:
   profiles:
     active: local
+  r2dbc:
+    pool:
+      initial-size: 1 # 초기 커넥션 수
+      max-size: 10 # 최대 커넥션 수
+      max-idle-time: 30s # 커넥션 유휴 최대 시간
+      max-create-connection-time: 5s #커넥션 생성 최대 허용 시간
 server:
   port: 8080
-jwt:
-  secret: ${ENC_KEY}
-  expiration: 10000
+logging:
+  level:
+    org.springframework.r2dbc.core: DEBUG
