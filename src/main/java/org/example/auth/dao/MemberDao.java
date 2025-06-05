@@ -10,6 +10,8 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,20 +27,27 @@ public class MemberDao {
 
     }
 
-    public Mono<CheckUserDto> findUserProjectionByUserId(String userId){
+    public Mono<Member> findUserProjectionByUserId(String userId){
         String sql = "SELECT " +
                 "user_id, " +
-                "user_name " +
+                "member_name," +
+                "user_role," +
+                "locale_code " +
                 "FROM member " +
                 "WHERE user_id = :userId";
         return entityTemplate.getDatabaseClient().sql(sql)
                 .bind("userId",userId)
                 .map(
                         (row, metadata)
-                                -> new CheckUserDto(
-                        row.get("user_id", String.class),
-                        row.get("user_name",String.class),
-                        true
-                )).one();
+                                -> {
+                            return Member.builder()
+                                    .userId(row.get("user_id",String.class))
+                                    .memberName(row.get("member_name",String.class))
+                                    .userRole(row.get("user_role",String.class))
+                                    .localeCode(row.get("locale_code", String.class))
+                                    .build();
+                        }
+                )
+                .one();
     }
 }

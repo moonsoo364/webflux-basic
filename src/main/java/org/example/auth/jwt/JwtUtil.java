@@ -72,23 +72,23 @@ public class JwtUtil {
         return doGenerateToken(claims, userId);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String username) {
+    private String doGenerateToken(Map<String, Object> claims, String userId) {
         final Instant createdDate = Instant.now();
         final Instant expirationDate = createdDate.plusMillis(expirationTimeMillis);
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(username)
+                .subject(userId)
                 .issuedAt(Date.from(createdDate))
                 .expiration(Date.from(expirationDate))
                 .signWith(key)
                 .compact();
     }
 
-    public Boolean validateToken(String token) {
+    public Boolean validateToken(String token, String username) {
         try {
             // 토큰을 파싱할 수 있는지 확인하여 유효성 검사
-            return !isTokenExpired(token); // 토큰이 만료되지 않았는지 추가 확인
+            return !isTokenExpired(token) && getUsernameFromToken(token).equals(username); // 토큰이 만료되지 않았는지 추가 확인
         } catch (ExpiredJwtException e) {
             log.error("## Token Expired : {}", e.getMessage());
             return false;

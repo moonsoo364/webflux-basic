@@ -1,8 +1,6 @@
 package org.example.auth.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.auth.dto.MemberDto;
 import org.example.common.model.LocaleDateEntity;
 import org.springframework.data.annotation.Id;
@@ -18,18 +16,22 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+
+
+@Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString(exclude = {"password", "regDt", "updDt", "newMember"})
 @Table("member") // R2DBC에서 사용하는 Table 매핑
-public class Member extends LocaleDateEntity implements UserDetails, Persistable<String> {
+public class Member implements UserDetails, Persistable<String> {
 
     @Id
     @Column("user_id")
     private String userId;
 
-    @Column("user_name")
-    private String userName;
+    @Column("member_name")
+    private String memberName;
 
     @Column("password")
     private String password;
@@ -37,11 +39,14 @@ public class Member extends LocaleDateEntity implements UserDetails, Persistable
     @Column("user_role")
     private String userRole;
 
-//    @Column("reg_dt")
-//    private LocalDateTime regDt;
-//
-//    @Column("upd_dt")
-//    private LocalDateTime updDt;
+    @Column("reg_dt")
+    protected LocalDateTime regDt;
+
+    @Column("upd_dt")
+    protected LocalDateTime updDt;
+
+    @Column("locale_code")
+    protected String localeCode;
 
     /** Persistable<String> 관련 코드 시작 */
     @Transient
@@ -62,7 +67,7 @@ public class Member extends LocaleDateEntity implements UserDetails, Persistable
     public Member(MemberDto dto) {
         this.userId = dto.getUserId();
         this.password = dto.getPassword();
-        this.userName = dto.getUserName();
+        this.memberName = dto.getMemberName();
         this.userRole = dto.getUserRole();
         this.newMember = true;// 명시적으로 새로운 행 추가
     }
@@ -80,11 +85,6 @@ public class Member extends LocaleDateEntity implements UserDetails, Persistable
     @Override
     public String getUsername() {
         return this.userId;
-    }
-
-    // UserDetails Override getUsername 메서드 때문에 따로 Getter 생성
-    public String getUserRealName(){
-        return this.userName;
     }
 
     @Override

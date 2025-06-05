@@ -60,11 +60,6 @@ public class AuthController {
                 });
     }
 
-    @GetMapping("/check/user/id")
-    public Mono<CheckUserDto> checkUserExistsById(@RequestParam(required = true) String userId){
-        return memberService.findUserProjectionByUserId(userId);
-    }
-
     @GetMapping("/test")
     public Mono<String> getTest(){
         return Mono.just("Hello");

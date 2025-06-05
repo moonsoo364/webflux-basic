@@ -44,8 +44,4 @@ public class MemberServiceImpl implements MemberService{
         return memberDao.findUserByUserId(userId);
     }
 
-    @Override
-    public Mono<CheckUserDto> findUserProjectionByUserId(String userId) {
-        return memberDao.findUserProjectionByUserId(userId);
-    }
 }

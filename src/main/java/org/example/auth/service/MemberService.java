@@ -13,6 +13,4 @@ public interface MemberService {
     Mono<Boolean> existsById(String userId);
 
     Mono<Member> findUserByUserId(String userId);
-
-    Mono<CheckUserDto> findUserProjectionByUserId(String userId);
 }
