@@ -42,6 +42,7 @@ public class SecurityConfig {
     @Bean
     public ReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
         UserDetailsRepositoryReactiveAuthenticationManager authenticationManager =new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+        authenticationManager.setPasswordEncoder(passwordEncoder);
         return authenticationManager;
     }
 
@@ -68,7 +69,8 @@ public class SecurityConfig {
     public AuthenticationWebFilter jwtAuthenticationWebFilter(){
         AuthenticationWebFilter webFilter = new AuthenticationWebFilter(authenticationManager(reactiveUserDetailsService(),passwordEncoder()));
         webFilter.setServerAuthenticationConverter(new JwtServerAuthenticationConverter(jwtUtil));
-        webFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
+        // 서버 세션 미사용으로 주석
+        //webFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
         return webFilter;
     }
 

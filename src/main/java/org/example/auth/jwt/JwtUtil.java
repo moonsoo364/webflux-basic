@@ -7,13 +7,12 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -45,6 +44,17 @@ public class JwtUtil {
 
     public String getUsernameFromToken(String token) {
         return getAllClaimsFromToken(token).getSubject();
+    }
+
+    public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        String role = claims.get("userRole", String.class);
+
+        if (role == null) {
+            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     public Instant getExpirationDateFromToken(String token) {
@@ -82,6 +92,9 @@ public class JwtUtil {
         } catch (ExpiredJwtException e) {
             log.error("## Token Expired : {}", e.getMessage());
             return false;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

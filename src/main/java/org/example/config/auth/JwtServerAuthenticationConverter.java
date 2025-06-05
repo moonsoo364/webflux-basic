@@ -27,7 +27,7 @@ public class JwtServerAuthenticationConverter implements ServerAuthenticationCon
                 .filter(jwtUtil::validateToken)
                 .map(token ->{
                     String userId = jwtUtil.getUsernameFromToken(token);
-                    List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                    List<SimpleGrantedAuthority> authorities = jwtUtil.getAuthoritiesFromToken(token);
                     return new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 })
                 .switchIfEmpty(Mono.empty())
