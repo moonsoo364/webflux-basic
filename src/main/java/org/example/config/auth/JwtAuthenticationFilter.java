@@ -30,16 +30,16 @@ public class JwtAuthenticationFilter implements WebFilter {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         return ReactiveSecurityContextHolder.getContext()
                 .flatMap(context -> {
-                    log.info("## SecurityContext exists : Member = {}", (Member)context.getAuthentication().getPrincipal());
+                    log.info("## SecurityContext exists :  = {}", (Member)context.getAuthentication().getPrincipal());
                     return chain.filter(exchange);
                 })
                 .switchIfEmpty(Mono.defer(()-> {
                     if (authHeader != null && authHeader.startsWith("Bearer ")) {
                         String token = authHeader.substring(7);
-                        String username = jwtUtil.getUsernameFromToken(token);
+                        String userId = jwtUtil.getUsernameFromToken(token);
 
-                        return memberDao.findUserProjectionByUserId(username)
-                                .filter(user -> jwtUtil.validateToken(token, username))
+                        return memberDao.findUserProjectionByUserId(userId)
+                                .filter(user -> jwtUtil.validateToken(token, userId))
                                 .flatMap(user -> {
                                     Authentication auth = new UsernamePasswordAuthenticationToken(
                                             user, null, user.getAuthorities());

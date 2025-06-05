@@ -11,4 +11,7 @@ public record CheckUserDto(
     public CheckUserDto(Member member, Boolean isExistsUser){
         this(member.getUserId(), member.getMemberName(), isExistsUser);
     }
+    public CheckUserDto(){
+        this(null, null, false);
+    }
 }

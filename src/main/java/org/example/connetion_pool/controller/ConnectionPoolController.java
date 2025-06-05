@@ -14,7 +14,7 @@ import java.util.Map;
 public class ConnectionPoolController {
     private final ConnectionPool connectionPool;
 
-    @GetMapping("/pool-status")
+    @GetMapping("/pool")
     public Mono<Map<String,Object>> getPoolStatus(){
         ConnectionPoolMetrics metrics = (ConnectionPoolMetrics) connectionPool.getMetrics().get();
 

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.example.auth.model.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -46,17 +47,6 @@ public class JwtUtil {
         return getAllClaimsFromToken(token).getSubject();
     }
 
-    public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        Claims claims = getAllClaimsFromToken(token);
-        String role = claims.get("userRole", String.class);
-
-        if (role == null) {
-            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
-    }
-
     public Instant getExpirationDateFromToken(String token) {
         return getAllClaimsFromToken(token).getExpiration().toInstant();
     }
@@ -66,10 +56,12 @@ public class JwtUtil {
         return expiration.isBefore(Instant.now());
     }
 
-    public String generateToken(String userId, String userRole) {
+    public String generateToken(Member member) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userRole", userRole);
-        return doGenerateToken(claims, userId);
+        claims.put("userRole", member.getUserRole());
+        claims.put("localeCode", member.getLocaleCode());
+        claims.put("memberName",member.getMemberName());
+        return doGenerateToken(claims, member.getUserId());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String userId) {

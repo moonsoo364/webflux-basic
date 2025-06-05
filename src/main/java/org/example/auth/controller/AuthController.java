@@ -2,6 +2,7 @@ package org.example.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.auth.dto.AuthRequest;
 import org.example.auth.dto.AuthResponse;
 import org.example.auth.dto.CheckUserDto;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -33,7 +35,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public Mono<ResponseEntity<ApiResponseDto>> register(@Valid @RequestBody MemberDto dto){
+    public Mono<ResponseEntity<ApiResponseDto>> register(
+            @Valid @RequestBody MemberDto dto
+            ){
         return memberService.registerMember(dto)
                 .map(member -> ResponseEntity.status(HttpStatus.CREATED)
                         .body(
@@ -59,9 +63,13 @@ public class AuthController {
                     );
                 });
     }
-
-    @GetMapping("/test")
-    public Mono<String> getTest(){
-        return Mono.just("Hello");
+    @GetMapping("/check/user/id")
+    public Mono<CheckUserDto> checkUserId(@RequestParam(required = true) String userId){
+        return memberService.findUserProjectionByUserId(userId).flatMap(
+                member -> {
+                    log.info(member.toString());
+            return Mono.just(new CheckUserDto(member,true));
+        });
     }
+
 }
