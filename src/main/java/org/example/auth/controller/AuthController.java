@@ -50,10 +50,20 @@ public class AuthController {
                         ))
                 );
     }
+//    @PostMapping("/register")
+//    public Mono<ApiResponseDto> register(@Valid @RequestBody MemberDto dto) {
+//        return memberService.registerMember(dto)
+//                .map(member -> new ApiResponseDto(ResultCode.SUCCESS, "User registered successfully!"))
+//                .onErrorResume(IllegalArgumentException.class, e ->
+//                        Mono.just(new ApiResponseDto(ResultCode.BAD_REQUEST, "check your member request")));
+//    }
     @GetMapping("/check/user")
-    public Mono<CheckUserDto> checkUserExists(@RequestParam(required = true) String userId){
+    public Mono<CheckUserDto> checkUserExists(@RequestParam(required = true) String userId) throws InterruptedException {
         Mono<Member> memberM =  memberService.findUserByUserId(userId);
         Mono<Boolean> isUserExistsM = memberService.existsById(userId);
+        for(int i = 0; i<100;i++){
+            memberService.findUserByUserId(userId).subscribe();
+        }
 
         return Mono.zip(memberM, isUserExistsM)
                 .map(tuple ->{
