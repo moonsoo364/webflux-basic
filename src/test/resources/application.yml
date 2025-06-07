@@ -7,8 +7,8 @@ spring:
     active: local
   r2dbc:
     pool:
-      initial-size: 2 # 초기 커넥션 수
-      max-size: 4 # 최대 커넥션 수
+      initial-size: 5 # 초기 커넥션 수
+      max-size: 10 # 최대 커넥션 수
       max-idle-time: 30s # 커넥션 유휴 최대 시간
       max-create-connection-time: 5s #커넥션 생성 최대 허용 시간
 server:

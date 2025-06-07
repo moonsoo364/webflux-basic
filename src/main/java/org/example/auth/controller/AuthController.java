@@ -60,18 +60,19 @@ public class AuthController {
     @GetMapping("/check/user")
     public Mono<CheckUserDto> checkUserExists(@RequestParam(required = true) String userId) throws InterruptedException {
         Mono<Member> memberM =  memberService.findUserByUserId(userId);
-        Mono<Boolean> isUserExistsM = memberService.existsById(userId);
-        for(int i = 0; i<100;i++){
-            memberService.findUserByUserId(userId).subscribe();
-        }
-
-        return Mono.zip(memberM, isUserExistsM)
-                .map(tuple ->{
-                    return new CheckUserDto(
-                            tuple.getT1(),
-                            tuple.getT2()
-                    );
-                });
+        return memberM.map(member -> new CheckUserDto(member, true));
+//        Mono<Boolean> isUserExistsM = memberService.existsById(userId);
+//        for(int i = 0; i<98;i++){
+//            memberService.findUserByUserId(userId).subscribe();
+//        }
+//
+//        return Mono.zip(memberM, isUserExistsM)
+//                .map(tuple ->{
+//                    return new CheckUserDto(
+//                            tuple.getT1(),
+//                            tuple.getT2()
+//                    );
+//                });
     }
     @GetMapping("/check/user/id")
     public Mono<CheckUserDto> checkUserId(@RequestParam(required = true) String userId){

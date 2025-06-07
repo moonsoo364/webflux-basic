@@ -1,4 +1,4 @@
-package org.example.netty;
+package org.example.netty.tcp;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.netty.tcp.TcpServer;

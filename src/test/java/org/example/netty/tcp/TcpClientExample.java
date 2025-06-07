@@ -1,8 +1,4 @@
-package org.example.netty;
-
-import reactor.core.publisher.Mono;
-import reactor.netty.tcp.TcpClient;
-import reactor.netty.tcp.TcpServer;
+package org.example.netty.tcp;
 
 import reactor.core.publisher.Mono;
 import reactor.netty.tcp.TcpClient;
