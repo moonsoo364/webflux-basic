@@ -10,7 +10,6 @@ import org.example.auth.dto.MemberDto;
 import org.example.auth.model.Member;
 import org.example.auth.service.AuthService;
 import org.example.auth.service.MemberService;
-
 import org.example.common.consts.ResultCode;
 import org.example.common.dto.ApiResponseDto;
 import org.springframework.http.HttpStatus;
@@ -81,6 +80,34 @@ public class AuthController {
                     log.info(member.toString());
             return Mono.just(new CheckUserDto(member,true));
         });
+    }
+    @GetMapping("/flux/range")
+    public void parallel(){
+//        트래쉬 쓰레드 무한 생성됨
+//        Scheduler customScheduler = Schedulers.newParallel("custom-parallel", 4); // 스레드 4개 사용
+//        Flux.range(1, 10)
+//                .parallel()
+//                .runOn(customScheduler) // 여기에서 customScheduler 사용
+//                .doOnNext(i -> {
+//                    try {
+//                        Thread.sleep(500);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    log.info("Current Index : {}", i);
+//                })
+//                .sequential()
+//                .subscribe();
+//        // thread 수동 제거
+//        customScheduler.dispose();
+
+//        Flux.range(1, 10)
+//                .parallel()
+//                .runOn(SchedulerProvider.CUSTOM_PARALLEL) // 재사용되는 스케줄러
+//                .doOnNext(i -> log.info("Current Index : {}", i))
+//                .sequential()
+//                .subscribe();
+
     }
 
 }

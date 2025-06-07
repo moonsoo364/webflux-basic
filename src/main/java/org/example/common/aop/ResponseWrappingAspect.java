@@ -49,23 +49,17 @@ public class ResponseWrappingAspect {
         Object proceed = pjp.proceed();
 
         if (proceed instanceof Flux<?> flux) {
-            return flux.collectList().map(data ->
-                    CommonResponse.builder()
-                            .resultCode("SUCCESS")
-                            .msg("요청이 성공적으로 처리되었습니다.")
-                            .body(data)
-                            .build()
-            ).onErrorResume(ex -> {
-                log.error("Exception in controller method: ", ex);
-                return Mono.just(CommonResponse.builder()
-                        .resultCode("ERROR")
-                        .msg(ex.getMessage())
-                        .body(null)
-                        .build());
-            });
+            return flux
+                    .map(data -> (Object) data) // 그냥 패스해도 됨
+                    .onErrorResume(ex -> {
+                        log.error("Exception in controller method: ", ex);
+                        return Flux.error(ex); // 그대로 Flux 에러로 넘김
+                    });
         }
+
         return proceed;
     }
+
 
     private ResponseEntity<CommonResponse<Object>> handleResponseEntity(ResponseEntity<?> entity){
             Object realBody = entity.getBody();
