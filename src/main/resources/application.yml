@@ -7,10 +7,14 @@ spring:
     active: local
   r2dbc:
     pool:
-      initial-size: 1 # 초기 커넥션 수
-      max-size: 1 # 최대 커넥션 수
-      max-idle-time: 30s # 커넥션 유휴 최대 시간
-      max-create-connection-time: 5s #커넥션 생성 최대 허용 시간
+      name: r2dbc-pool
+      enabled: true # pool 사용여부 default true
+      initial-size: 6 # 초기 커넥션 수, 할당된 풀 사이즈가 0일 때 DB 커넥션을 맺을 경우 1이 아니라 이 값으로 풀을 생성합니다.
+      max-size: 12 #풀에서 동시에 유지할 수 있는 커넥션의 최대 수를 설정합니다. 동시에 이 커넥션 풀을 가질 수 있습니다. 초과 요청은 대기(pending) 상태로 적재됩니다.
+      max-acquire-time: 10s #커넥션을 풀에서 획득하는 데 허용되는 최대 대기 시간입니다. 예를 들어, 커넥션이 모두 사용 중일 때, 이 시간 안에 커넥션이 풀에서 반환되지 않으면 커넥션 획득 시도가 실패하고 예외가 발생합니다.
+      max-idle-time: 1m # 커넥션이 풀에서 유휴 상태(아무 작업 없이 놀고 있는 상태)로 유지될 수 있는 최대 시간입니다. 이 시간이 지나면 해당 커넥션은 종료되고 풀에서 제거되어 자원 낭비를 줄입니다. 이 값은 max-life-time보다 작아야 합니다.
+      max-create-connection-time: 1m #커넥션 생성 최대 허용 시간
+      max-life-time: 2m #각 커넥션의 최대 생존 시간을 의미합니다. 이 시간이 지나면 커넥션이 아직 사용 중이더라도 해당 커넥션은 풀에서 제거되고 새 커넥션으로 대체됩니다.
 server:
   port: 8080
 

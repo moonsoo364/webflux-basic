@@ -34,12 +34,6 @@ public class SecurityConfig {
                 .cast(UserDetails.class);
     }
 
-//    @Bean
-//    public ReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
-//        UserDetailsRepositoryReactiveAuthenticationManager authenticationManager =new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-//        authenticationManager.setPasswordEncoder(passwordEncoder);
-//        return authenticationManager;
-//    }
 
 
     @Bean
@@ -48,7 +42,6 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                //.authenticationManager(authenticationManager(reactiveUserDetailsService(),passwordEncoder()))
                 .authorizeExchange(exchanges-> exchanges
                         .pathMatchers("/auth/**").permitAll()
                         .anyExchange().authenticated()
