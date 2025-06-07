@@ -234,13 +234,14 @@ R2DBC에서 커넥션 풀은 데이터베이스와의 연결을 효율적으로 
   r2dbc:
     pool:
       name: r2dbc-pool
-      enabled: true # pool 사용여부 default true
-      initial-size: 6 # 초기 커넥션 수, 할당된 풀 사이즈가 0일 때 DB 커넥션을 맺을 경우 1이 아니라 이 값으로 풀을 생성합니다.
-      max-size: 12 #풀에서 동시에 유지할 수 있는 커넥션의 최대 수를 설정합니다. 동시에 이 커넥션 풀을 가질 수 있습니다. 초과 요청은 대기(pending) 상태로 적재됩니다.
-      max-acquire-time: 10s #커넥션을 풀에서 획득하는 데 허용되는 최대 대기 시간입니다. 예를 들어, 커넥션이 모두 사용 중일 때, 이 시간 안에 커넥션이 풀에서 반환되지 않으면 커넥션 획득 시도가 실패하고 예외가 발생합니다.
-      max-idle-time: 1m # 커넥션이 풀에서 유휴 상태(아무 작업 없이 놀고 있는 상태)로 유지될 수 있는 최대 시간입니다. 이 시간이 지나면 해당 커넥션은 종료되고 풀에서 제거되어 자원 낭비를 줄입니다. 이 값은 max-life-time보다 작아야 합니다.
-      max-create-connection-time: 1m #커넥션 생성 최대 허용 시간
-      max-life-time: 2m #각 커넥션의 최대 생존 시간을 의미합니다. 이 시간이 지나면 커넥션이 아직 사용 중이더라도 해당 커넥션은 풀에서 제거되고 새 커넥션으로 대체됩니다.
+      enabled: true 
+      initial-size: 6 
+      max-size: 12 
+      max-acquire-time: 10s 
+      max-idle-time: 1m 
+      max-create-connection-time: 1m 
+      max-life-time: 2m 
+
 ```
 
 | 설정 항목                        | 설명                                                                         |
@@ -253,7 +254,53 @@ R2DBC에서 커넥션 풀은 데이터베이스와의 연결을 효율적으로 
 | `max-idle-time`              | 커넥션이 유휴 상태로 유지될 수 있는 최대 시간입니다. 초과 시 커넥션은 종료됩니다. `max-life-time`보다 작아야 합니다. |
 | `max-create-connection-time` | 새 커넥션을 생성하는 데 허용되는 최대 시간입니다. 이 시간을 초과하면 커넥션 생성이 실패합니다.                     |
 | `max-life-time`              | 커넥션의 최대 생존 시간입니다. 이 시간이 지나면 사용 중이더라도 커넥션은 제거되고 새 커넥션으로 교체됩니다.              |
+### Connection Pool 디버깅하기
 
+애플리케이션이 운영중인 상황에서 현재 커넥션 풀의 상태를 알고 싶을 때가 있습니다. R2DBC에서는 `ConnectionPool` 객체를 이용하여 현재 사용 중인 Pool 의 상태를 알 수 있습니다.
+
+아래와 같이 커넥션 풀의 상태를 조회할 수 있는 API를 만들 수 있습니다.
+
+```java
+@RestController
+@RequestMapping("/auth/db")
+@RequiredArgsConstructor
+public class ConnectionPoolController {
+    private final ConnectionPool connectionPool;
+
+    @GetMapping("/pool")
+    public Mono<Map<String, Object>> getPoolStatus() {
+        PoolMetrics metrics = connectionPool.getMetrics()
+                .orElseThrow(() -> new IllegalStateException("ConnectionPoolMetrics is not available"));
+
+        return Mono.just(Map.of(
+                "MaxAllocatedSize", metrics.getMaxAllocatedSize(),
+                "idleSize", metrics.idleSize(),
+                "pendingAcquireSize", metrics.pendingAcquireSize(),
+                "acquiredSize", metrics.acquiredSize(),
+                "allocatedSize", metrics.allocatedSize()
+        ));
+    }
+
+}
+```
+
+여기서 눈여겨 봐야할 값은 `acquiredSize` 와 `pendingAcquireSize` 값입니다.  `acquiredSize` 은 현재 데이터베이스와 연결되고 트랜잭션 작업을 하고 있는 커넥션 풀이고 `pendingAcquireSize` 대기 중인 작업 큐 개수를 의미 합니다.
+
+충분한 커넥션 풀을 확보하더라도 실제 작업하고 있는 풀이 적고 쌓여있는 작업이 많다면 어디에서 병목 현상이 있을 수 있습니다.
+
+이를 확인하기 위해선 visualVM을 활용해 CPU, Thread, Heap 정보를 같이 확인하는 것이 좋습니다.
+
+아래는 위 API를 호출했을 때의 응답 예시 입니다. 최대 커넥션 풀까지 도달 했지만 대기 중인 큐는 44개나 있고 활동 중인 풀은 1개이며 대기중인 풀은 11개 입니다. 어디선가 문제가 있다는 점을 알 수 있습니다.
+
+```json
+{
+    "MaxAllocatedSize": 12,
+    "acquiredSize": 1,
+    "idleSize": 11,
+    "allocatedSize": 12,
+    "pendingAcquireSize": 44
+}
+```
 ## 기타 유용한 설정
 
 웹플럭스에서 작업 쓰레드 개수가 부족하면 BoundedElastic 쓰레드가 생성됩니다. 이 쓰레드의 최대 값은 가용 코어 수 * 10 입니다. 너무 많은 쓰레드를 할당하고 싶지 않다면 vm option에 명시적으로 개수를 제한할 수 있습니다. 또한 BoundedElastic 쓰레드가 사용할 대기 중인 큐의 개수도 제한할 수 있습니다. 아래는 vm 설정 값 입니다.
