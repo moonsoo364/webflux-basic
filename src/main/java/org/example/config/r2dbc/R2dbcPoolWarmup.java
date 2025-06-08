@@ -16,6 +16,7 @@ public class R2dbcPoolWarmup {
 
     @EventListener(ApplicationReadyEvent.class)
     public void warmupPool(){
+
         connectionPool.warmup()
                 .doOnSuccess(pools-> log.info("R2DBC connetion pool warmed up! initial-pool-size: {}", pools))
                 .doOnError(error -> log.error("Failed to warmup connection pool: {}", error.getMessage()))

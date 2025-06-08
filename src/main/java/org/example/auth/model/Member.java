@@ -1,5 +1,6 @@
 package org.example.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.example.auth.dto.MemberDto;
 import org.springframework.data.annotation.Id;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-
+import java.util.List;
 
 
 @Getter
@@ -23,6 +24,8 @@ import java.util.Collections;
 @AllArgsConstructor
 @ToString(exclude = {"password", "regDt", "updDt", "newMember"})
 @Table("member") // R2DBC에서 사용하는 Table 매핑
+//redis 역직렬화 오류 방지
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Member implements UserDetails, Persistable<String> {
 
     @Id
@@ -60,6 +63,8 @@ public class Member implements UserDetails, Persistable<String> {
     public boolean isNew() {
         return this.newMember || userId == null;
     }
+
+    private List<SimpleGrantedAuthority> authorities;
     /** Persistable<String> 관련 코드 종료*/
 
     //repository.save() 생성자

@@ -15,4 +15,6 @@ public interface MemberService {
     Mono<Member> findUserByUserId(String userId);
 
     Mono<Member> findUserProjectionByUserId(String userId);
+
+    Mono<Member> findUserByUserIdUseCache(String userId);
 }

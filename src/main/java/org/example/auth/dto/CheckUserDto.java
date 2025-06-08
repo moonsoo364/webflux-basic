@@ -8,8 +8,8 @@ public record CheckUserDto(
         Boolean isExistsUser
 ){
 
-    public CheckUserDto(Member member, Boolean isExistsUser){
-        this(member.getUserId(), member.getMemberName(), isExistsUser);
+    public CheckUserDto(Member member){
+        this(member.getUserId(), member.getMemberName(), true);
     }
     public CheckUserDto(){
         this(null, null, false);

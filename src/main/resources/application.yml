@@ -15,9 +15,16 @@ spring:
       max-idle-time: 1m # 커넥션이 풀에서 유휴 상태(아무 작업 없이 놀고 있는 상태)로 유지될 수 있는 최대 시간입니다. 이 시간이 지나면 해당 커넥션은 종료되고 풀에서 제거되어 자원 낭비를 줄입니다. 이 값은 max-life-time보다 작아야 합니다.
       max-create-connection-time: 1m #커넥션 생성 최대 허용 시간
       max-life-time: 2m #각 커넥션의 최대 생존 시간을 의미합니다. 이 시간이 지나면 커넥션이 아직 사용 중이더라도 해당 커넥션은 풀에서 제거되고 새 커넥션으로 대체됩니다.
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PW}
 server:
   port: 8080
 
 logging:
   level:
      org.springframework.r2dbc.core: DEBUG # R2DBC SQL 로그 디버깅
+     io.lettuce.core: DEBUG        # Lettuce 클라이언트 디버깅
+     #io.lettuce.core.protocol: TRACE # Redis 요청/응답 raw 로그 (선택적)

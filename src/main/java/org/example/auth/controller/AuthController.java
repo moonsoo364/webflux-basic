@@ -59,31 +59,24 @@ public class AuthController {
     @GetMapping("/check/user")
     public Mono<CheckUserDto> checkUserExists(@RequestParam(required = true) String userId) throws InterruptedException {
         Mono<Member> memberM =  memberService.findUserByUserId(userId);
-        return memberM.map(member -> new CheckUserDto(member, true));
-//        Mono<Boolean> isUserExistsM = memberService.existsById(userId);
-//        for(int i = 0; i<98;i++){
-//            memberService.findUserByUserId(userId).subscribe();
-//        }
-//
-//        return Mono.zip(memberM, isUserExistsM)
-//                .map(tuple ->{
-//                    return new CheckUserDto(
-//                            tuple.getT1(),
-//                            tuple.getT2()
-//                    );
-//                });
+        return memberM.map(CheckUserDto::new);
     }
     @GetMapping("/check/user/id")
     public Mono<CheckUserDto> checkUserId(@RequestParam(required = true) String userId){
         return memberService.findUserProjectionByUserId(userId).flatMap(
                 member -> {
-                    log.info(member.toString());
-            return Mono.just(new CheckUserDto(member,true));
+            return Mono.just(new CheckUserDto(member));
         });
+    }
+    @GetMapping("/check/user/cache")
+    public Mono<CheckUserDto> checkUserIdByCache(@RequestParam(required = true) String userId){
+        return memberService.findUserByUserIdUseCache(userId)
+                .map(CheckUserDto::new)
+                .switchIfEmpty(Mono.just(new CheckUserDto()));
     }
     @GetMapping("/flux/range")
     public void parallel(){
-//        트래쉬 쓰레드 무한 생성됨
+//        trash 쓰레드 무한 생성됨
 //        Scheduler customScheduler = Schedulers.newParallel("custom-parallel", 4); // 스레드 4개 사용
 //        Flux.range(1, 10)
 //                .parallel()
