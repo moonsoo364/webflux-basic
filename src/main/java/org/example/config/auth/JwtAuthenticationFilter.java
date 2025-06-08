@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.auth.dao.MemberDao;
 import org.example.auth.jwt.JwtUtil;
 import org.example.auth.model.Member;
+import org.example.auth.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,8 @@ import reactor.core.publisher.Mono;
 public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtUtil jwtUtil;
-    private final MemberDao memberDao;
+    //private final MemberDao memberDao;
+    private final MemberService memberService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -38,8 +40,9 @@ public class JwtAuthenticationFilter implements WebFilter {
                         String token = authHeader.substring(7);
                         String userId = jwtUtil.getUsernameFromToken(token);
 
-                        return memberDao.findUserProjectionByUserId(userId)
+                        return memberService.findUserProjectionByUserId(userId)
                                 .filter(user -> jwtUtil.validateToken(token, userId))
+                                .map(Member::new)
                                 .flatMap(user -> {
                                     Authentication auth = new UsernamePasswordAuthenticationToken(
                                             user, null, user.getAuthorities());

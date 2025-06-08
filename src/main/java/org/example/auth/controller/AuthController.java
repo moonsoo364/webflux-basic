@@ -37,6 +37,7 @@ public class AuthController {
     public Mono<ResponseEntity<ApiResponseDto>> register(
             @Valid @RequestBody MemberDto dto
             ){
+        dto.setNewMember(true);
         return memberService.registerMember(dto)
                 .map(member -> ResponseEntity.status(HttpStatus.CREATED)
                         .body(
@@ -56,11 +57,7 @@ public class AuthController {
 //                .onErrorResume(IllegalArgumentException.class, e ->
 //                        Mono.just(new ApiResponseDto(ResultCode.BAD_REQUEST, "check your member request")));
 //    }
-    @GetMapping("/check/user")
-    public Mono<CheckUserDto> checkUserExists(@RequestParam(required = true) String userId) throws InterruptedException {
-        Mono<Member> memberM =  memberService.findUserByUserId(userId);
-        return memberM.map(CheckUserDto::new);
-    }
+
     @GetMapping("/check/user/id")
     public Mono<CheckUserDto> checkUserId(@RequestParam(required = true) String userId){
         return memberService.findUserProjectionByUserId(userId).flatMap(

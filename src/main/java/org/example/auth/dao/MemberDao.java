@@ -3,6 +3,7 @@ package org.example.auth.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.auth.dto.CheckUserDto;
+import org.example.auth.dto.MemberDto;
 import org.example.auth.model.Member;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
@@ -27,7 +28,7 @@ public class MemberDao {
 
     }
 
-    public Mono<Member> findUserProjectionByUserId(String userId){
+    public Mono<MemberDto> findUserProjectionByUserId(String userId){
         String sql = "SELECT " +
                 "user_id, " +
                 "member_name," +
@@ -40,7 +41,7 @@ public class MemberDao {
                 .map(
                         (row, metadata)
                                 -> {
-                            return Member.builder()
+                            return MemberDto.builder()
                                     .userId(row.get("user_id",String.class))
                                     .memberName(row.get("member_name",String.class))
                                     .userRole(row.get("user_role",String.class))

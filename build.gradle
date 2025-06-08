@@ -49,6 +49,8 @@ dependencies {
 
     // Resdis : RDBMS 캐시 용도
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    // redis connection pool 용도
+    implementation 'org.apache.commons:commons-pool2:2.11.1'
 
     // 테스트 의존성
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

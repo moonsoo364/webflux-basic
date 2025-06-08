@@ -1,7 +1,7 @@
 package org.example.config.redis;
 
 import lombok.RequiredArgsConstructor;
-import org.example.auth.model.Member;
+import org.example.auth.dto.MemberDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -17,11 +17,11 @@ public class RedisConfig {
     private final ReactiveRedisConnectionFactory redisConnectionFactory;
 
     @Bean(name = "redisMemberCache")
-    public ReactiveRedisTemplate<String, Member> redisMemberCache() {
+    public ReactiveRedisTemplate<String, MemberDto> redisMemberCache() {
 
-        RedisSerializationContext<String, Member> context =
-                RedisSerializationContext.<String, Member>newSerializationContext(new StringRedisSerializer())
-                        .value(new Jackson2JsonRedisSerializer<>(Member.class))
+        RedisSerializationContext<String, MemberDto> context =
+                RedisSerializationContext.<String, MemberDto>newSerializationContext(new StringRedisSerializer())
+                        .value(new Jackson2JsonRedisSerializer<>(MemberDto.class))
                         .build();
 
         return new ReactiveRedisTemplate<>(redisConnectionFactory, context);

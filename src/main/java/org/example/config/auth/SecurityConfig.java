@@ -2,10 +2,9 @@ package org.example.config.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.example.auth.dao.MemberDao;
+import org.example.auth.model.Member;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -31,6 +30,7 @@ public class SecurityConfig {
     @Bean
     public ReactiveUserDetailsService reactiveUserDetailsService() {
         return userId -> memberDao.findUserProjectionByUserId(userId)
+                .map(Member::new )
                 .cast(UserDetails.class);
     }
 

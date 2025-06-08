@@ -16,7 +16,7 @@ import java.security.Principal;
 public class UserController {
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER_ROLE', 'ADMIN_ROLE')")
     public Mono<ResponseEntity<String>> getCurrentUser(Mono<Principal> principal) {
         return principal
                 .map(Principal::getName)
@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/admin-only")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN_ROLE')")
     public Mono<ResponseEntity<String>> adminOnly() {
         return Mono.just(ResponseEntity.ok("This is an admin-only endpoint."));
     }

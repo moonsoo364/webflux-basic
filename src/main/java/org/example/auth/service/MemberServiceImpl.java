@@ -1,12 +1,11 @@
 package org.example.auth.service;
 
-import lombok.RequiredArgsConstructor;
 import org.example.auth.dao.MemberDao;
-import org.example.auth.dto.CheckUserDto;
 import org.example.auth.dto.MemberDto;
 import org.example.auth.model.Member;
 import org.example.auth.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,17 +18,20 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberDao memberDao;
-    private final ReactiveRedisTemplate<String,Member> redisTemplate;
+    private final ReactiveRedisTemplate<String,MemberDto> redisTemplate;
+    private final Integer cacheTime;
 
     public MemberServiceImpl(
             MemberRepository memberRepository,
             PasswordEncoder passwordEncoder,
             MemberDao memberDao,
-            @Qualifier("redisMemberCache") ReactiveRedisTemplate<String, Member> redisTemplate) {
+            @Qualifier("redisMemberCache") ReactiveRedisTemplate<String, MemberDto> redisTemplate,
+            @Value("${spring.data.redis.cache-time}") Integer cacheTime) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.memberDao = memberDao;
         this.redisTemplate = redisTemplate;
+        this.cacheTime = cacheTime;
     }
 
     @Override
@@ -59,20 +61,22 @@ public class MemberServiceImpl implements MemberService{
         return memberDao.findUserByUserId(userId);
     }
 
+    //마리아 디비 조회
     @Override
-    public Mono<Member> findUserProjectionByUserId(String userId) {
+    public Mono<MemberDto> findUserProjectionByUserId(String userId) {
         return memberDao.findUserProjectionByUserId(userId);
     }
 
+    //마리아 디비 1회 조회 후 레디스 캐시
     @Override
-    public Mono<Member> findUserByUserIdUseCache(String userId) {
+    public Mono<MemberDto> findUserByUserIdUseCache(String userId) {
         return redisTemplate.opsForValue().get(userId)
                 .switchIfEmpty(
                         memberDao.findUserProjectionByUserId(userId)
                                 .flatMap(member -> {
                                             if(member == null) return Mono.empty();// null cache 방지
                                             return redisTemplate.opsForValue()
-                                                    .set(userId, member, Duration.ofMinutes(15))
+                                                    .set(userId, member, Duration.ofMinutes(cacheTime))
                                                     .thenReturn(member);
                                         }
 

@@ -1,5 +1,6 @@
 package org.example.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.example.auth.dto.MemberDto;
@@ -35,6 +36,7 @@ public class Member implements UserDetails, Persistable<String> {
     @Column("member_name")
     private String memberName;
 
+    @JsonIgnore
     @Column("password")
     private String password;
 
@@ -64,7 +66,6 @@ public class Member implements UserDetails, Persistable<String> {
         return this.newMember || userId == null;
     }
 
-    private List<SimpleGrantedAuthority> authorities;
     /** Persistable<String> 관련 코드 종료*/
 
     //repository.save() 생성자
@@ -73,7 +74,9 @@ public class Member implements UserDetails, Persistable<String> {
         this.password = dto.getPassword();
         this.memberName = dto.getMemberName();
         this.userRole = dto.getUserRole();
-        this.newMember = true;// 명시적으로 새로운 행 추가
+        this.localeCode = dto.getLocaleCode();
+        this.newMember = dto.isNewMember();// 명시적으로 새로운 행 추가
+
     }
 
     @Override
