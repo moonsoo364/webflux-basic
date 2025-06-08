@@ -15,6 +15,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UserController {
 
+    //redis cache test에서 이 api 사용
     @GetMapping("/me")
     @PreAuthorize("hasAnyAuthority('USER_ROLE', 'ADMIN_ROLE')")
     public Mono<ResponseEntity<String>> getCurrentUser(Mono<Principal> principal) {
